@@ -111,26 +111,20 @@ Thanks to [@Stonesjtu](https://github.com/Stonesjtu/pytorch_memlab/blob/d590c489
 - **FedPAC** — [Personalized Federated Learning with Feature Alignment and Classifier Collaboration](https://openreview.net/pdf?id=SXZr8aDKia) *ICLR 2023*
 
 ## Datasets and scenarios (updating)
-For the ***label skew*** scenario, we introduce **14** famous datasets: **MNIST**, **EMNIST**, **Fashion-MNIST**, **Cifar10**, **Cifar100**, **AG News**, **Sogou News**, **Tiny-ImageNet**, **Country211**, **Flowers102**, **GTSRB**, **Shakespeare**, and **Stanford Cars**, they can be easy split into **IID** and **non-IID** version. Since some codes for generating datasets such as splitting are the same for all datasets, we move these codes into `./dataset/utils/dataset_utils.py`. In the **non-IID** scenario, 2 situations exist. The first one is the **pathological non-IID** scenario, the second one is the **practical non-IID** scenario. In the **pathological non-IID** scenario, for example, the data on each client only contains the specific number of labels (maybe only 2 labels), though the data on all clients contains 10 labels such as the MNIST dataset. In the **practical non-IID** scenario, Dirichlet distribution is utilized (please refer to this [paper](https://proceedings.neurips.cc/paper/2020/hash/18df51b97ccd68128e994804f3eccc87-Abstract.html) for details). We can input `balance` for the iid scenario, where the data are uniformly distributed. 
 
-For the ***feature shift*** scenario, we use **3** datasets that are widely used in Domain Adaptation: **Amazon Review** (fetch raw data from [this site](https://drive.google.com/file/d/1QbXFENNyqor1IlCpRRFtOluI2_hMEd1W/view?usp=sharing)), **Digit5** (fetch raw data from [this site](https://drive.google.com/file/d/1PT6K-_wmsUEUCxoYzDy0mxF-15tvb2Eu/view?usp=share_link)), and **DomainNet**.
+Generating CIFAR-10 Dataset
+To generate a non-IID version of the CIFAR-10 dataset, follow these steps:
 
-For the ***real-world (or IoT)*** scenario, we also introduce **3** naturally separated datasets: **Omniglot** (20 clients, 50 labels), **HAR (Human Activity Recognition)** (30 clients, 6 labels), **PAMAP2** (9 clients, 12 labels). For the details of datasets and FL algorithms in **IoT**, please refer to [my FL-IoT repo](https://github.com/TsingZ0/FL-IoT).
+Navigate to the Dataset Directory:
 
-*If you need another data set, just write another code to download it and then use the utils.*
-
-### Examples for **MNIST**
-- MNIST
+- Cifar10
     ```
     cd ./dataset
-    # python generate_MNIST.py iid - - # for iid and unbalanced scenario
-    # python generate_MNIST.py iid balance - # for iid and balanced scenario
-    # python generate_MNIST.py noniid - pat # for pathological noniid and unbalanced scenario
-    python generate_MNIST.py noniid - dir # for practical noniid and unbalanced scenario
-    # python generate_MNIST.py noniid - exdir # for Extended Dirichlet strategy 
-    ```
+    python generate_Cifar10.py noniid - dir
 
-The output of `python generate_MNIST.py noniid - dir`
+This script will generate a CIFAR-10 dataset split according to the practical non-IID scenario using Dirichlet distribution.
+
+The output of `python generate_Cifar10.py noniid - dir`
 ```
 Number of classes: 10
 Client 0         Size of data: 2630      Labels:  [0 1 4 5 7 8 9]
@@ -250,22 +244,34 @@ conda env create -f env_cuda_latest.yaml # You may need to downgrade the torch u
 
 ## How to start simulating (examples for FedAvg)
 
-- Create proper environments (see [Environments](#environments)).
+- After setting up your environment and generating the required dataset, you can start running the federated learning algorithms provided in the library. Below are the different algorithms with the CIFAR-10 dataset used in the evaluation section of the dissertation.
 
-- Download [this project](https://github.com/TsingZ0/PFLlib) to an appropriate location using [git](https://git-scm.com/).
-    ```bash
-    git clone https://github.com/TsingZ0/PFLlib.git
-    ```
+- Navigate to the System Directory:
 
-- Build evaluation scenarios (see [Datasets and scenarios (updating)](#datasets-and-scenarios-updating)).
+cd ./system
+-Run FedAvg on CIFAR-10:
+python main.py -data Cifar10 -m cnn -algo FedAvg -gr 100 -did 0
 
-- Run evaluation: 
-    ```bash
-    cd ./system
-    python main.py -data MNIST -m cnn -algo FedAvg -gr 2000 -did 0 # using the MNIST dataset, the FedAvg algorithm, and the 4-layer CNN model
-    ```
 
-**Note**: It is preferable to tune algorithm-specific hyper-parameters before using any algorithm on a new machine. 
+-Run BFSSL on CIFAR-10:
+python main.py -data Cifar10 -m bcnn -algo FedSSLAvg -gr 100 -did 0
+
+-Run BFSSL using just labelled data on CIFAR-10:
+python main.py -data Cifar10 -m bcnn -algo FedSLAvg -gr 100 -did 0
+
+-Run FedProx on CIFAR-10:
+python main.py -data Cifar10 -m cnn -algo FedProx -gr 100 -did 0
+
+-Run PerAvg on CIFAR-10:
+python main.py -data Cifar10 -m cnn -algo PerAvg -gr 100 -did 0
+
+-Run FedPer on CIFAR-10:
+python main.py -data Cifar10 -m cnn -algo FedPer -gr 100 -did 0
+
+
+Note: It is preferable to tune algorithm-specific hyper-parameters before using any algorithm on a new machine.
+
+
 
 ## Practical situations
 If you need to simulate FL under practical situations, which includes **client dropout**, **slow trainers**, **slow senders**, and **network TTL**, you can set the following parameters to realize it.
