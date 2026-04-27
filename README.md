@@ -1,3 +1,27 @@
+# BFSSL: Bayesian Federated Semi-Supervised Learning
+**MSc Dissertation Extension — University of Glasgow, 2024**
+**Author: Vishal Ponnusami**
+
+This repository extends [PFLlib](https://github.com/TsingZ0/PFLlib) 
+with a novel BFSSL algorithm combining Bayesian Neural Networks and 
+Semi-Supervised Learning for federated learning.
+
+## My Contribution
+- `system/flcore/clients/clientSSLAvg.py` — BFSSL client
+- `system/flcore/servers/serverSSLAvg.py` — BFSSL server
+
+## Results
+| Algorithm | Accuracy | AUC    |
+|-----------|----------|--------|
+| BFSSL     | 73.53%   | 91.64% |
+| FedAvg    | 54.45%   | 88.06% |
+| FedProx   | 55.73%   | 88.87% |
+
+## Run BFSSL
+```bash
+python main.py -data Cifar10 -m bcnn -algo FedSSLAvg -gr 100 -did 0
+```
+
 # PFLlib: Personalized Federated Learning Algorithm Library
 
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html) [![arXiv](https://img.shields.io/badge/arXiv-2312.04992-b31b1b.svg)](https://arxiv.org/abs/2312.04992)
